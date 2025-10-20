@@ -1,36 +1,84 @@
-import { useState } from "react";
+import { useState, memo, useMemo, useCallback } from "react";
 import { RiMenuLine } from "react-icons/ri";
+
+const handleScrollToHero = (e) => {
+  e.preventDefault();
+  const heroSection = document.querySelector("#hero");
+  if (heroSection) {
+    window.scrollTo({
+      top: heroSection.offsetTop,
+      behavior: "smooth",
+    });
+  }
+};
+
+// Move static data outside component to prevent recreation
+const NAV_LINKS = [
+  {
+    type: "link",
+    name: "Live Classes",
+    href: "#live",
+    className: "hidden md:block",
+  },
+];
+
+const BUTTONS = [
+  { type: "button", name: "Sign In", className: "hidden md:block" },
+  { type: "button", name: "Teach Music", className: "hidden md:block" },
+];
+
+// Constant class strings to avoid recreation
+const BUTTON_CLASSES = {
+  common: "btn btn-outline btn-primary rounded-button whitespace-nowrap",
+  mobile: "w-full justify-center md:hidden",
+  primary: "btn btn-primary rounded-button whitespace-nowrap",
+  menuButton: "md:hidden w-8 h-8 flex items-center justify-center",
+  mobileMenu: "md:hidden mt-4 flex flex-col space-y-3 p-2.5",
+  menuContainer: "overflow-hidden transition-all duration-300 ease-in-out",
+  menuItem: "transform transition-all duration-300 ease-in-out",
+  hover: "text-gray-700 hover:text-primary transition-colors duration-200",
+};
+
+// Memoized button component for better performance
+const NavButton = memo(({ className, children, ...props }) => (
+  <button className={className} type="button" {...props}>
+    {children}
+  </button>
+));
+NavButton.displayName = "NavButton";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const navLinks = [
-    { name: "Home", href: "#top" },
-    { name: "Live Classes", href: "#live" },
-  ];
+  // Memoize mobile menu items (links + buttons)
+  const mobileMenuItems = useMemo(() => [...NAV_LINKS, ...BUTTONS], []);
 
-  const buttons = [
-    { name: "Sign In", className: "hidden md:block" },
-    { name: "Teach Music", className: "hidden md:block" },
-  ];
-  const commonButtonClasses =
-    "px-4 py-2 border border-primary rounded-button hover:bg-primary hover:text-white transition-all duration-200 whitespace-nowrap";
+  // Memoize desktop nav links
+  const desktopNavLinks = useMemo(() => NAV_LINKS, []);
+
+  // Memoize desktop buttons
+  const desktopButtons = useMemo(() => BUTTONS, []);
+
+  // Memoized handler
+  const handleMenuToggle = useCallback(() => setMenuOpen((open) => !open), []);
 
   return (
-    <nav className="sticky top-0 z-50 bg-black/70 backdrop-blur-lg border-b border-gray-200/50 ">
+    <nav className="sticky top-0 z-50 bg-white/70 backdrop-blur-lg border-b border-b-blue-900/50 p-1">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Links */}
           <div className="flex items-center space-x-8">
             <div className="font-[Pacifico] text-2xl text-primary">
-              Raaga Maala
+              <a href={"#hero"} onClick={handleScrollToHero}>
+                Raaga Maala
+              </a>
             </div>
             <div className="hidden md:flex items-center space-x-6">
-              {navLinks.map((link) => (
+              {desktopNavLinks.map((link) => (
                 <a
                   key={link.name}
                   href={link.href}
-                  className="text-gray-700 hover:text-primary transition-colors duration-200"
+                  className={BUTTON_CLASSES.hover}
                 >
                   {link.name}
                 </a>
@@ -40,50 +88,70 @@ const Navbar = () => {
 
           {/* Buttons & Mobile menu button */}
           <div className="flex items-center space-x-4">
-            {buttons.map((btn) => (
-              <button
+            {desktopButtons.map((btn) => (
+              <NavButton
                 key={btn.name}
-                className={`${commonButtonClasses} ${btn.className} text-primary`}
+                className={`${BUTTON_CLASSES.common} ${btn.className}`}
               >
                 {btn.name}
-              </button>
+              </NavButton>
             ))}
 
-            <button className="px-4 py-2 bg-primary text-white rounded-button hover:bg-primary/90 transition-all duration-200 whitespace-nowrap">
+            <NavButton className={BUTTON_CLASSES.primary}>
               Get Started
-            </button>
+            </NavButton>
 
             <button
-              className="md:hidden w-8 h-8 flex items-center justify-center"
-              onClick={() => setMenuOpen(!menuOpen)}
+              className={BUTTON_CLASSES.menuButton}
+              onClick={handleMenuToggle}
+              aria-label="Toggle menu"
+              aria-expanded={menuOpen}
             >
               <RiMenuLine className="text-xl" />
             </button>
           </div>
         </div>
 
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="md:hidden mt-4 flex flex-col space-y-2">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-gray-700 hover:text-primary transition-colors duration-200"
-              >
-                {link.name}
-              </a>
-            ))}
-            {buttons.map((btn) => (
-              <button
-                key={btn.name}
-                className={`${commonButtonClasses} text-primary md:hidden`}
-              >
-                {btn.name}
-              </button>
-            ))}
+        {/* Mobile menu with animation */}
+        <div
+          className={BUTTON_CLASSES.menuContainer}
+          style={{ maxHeight: menuOpen ? "500px" : "0px" }}
+        >
+          <div
+            className={`${BUTTON_CLASSES.mobileMenu} opacity-${
+              menuOpen ? "100" : "0"
+            } transform ${menuOpen ? "translate-y-0" : "-translate-y-2"}`}
+          >
+            {mobileMenuItems.map((item, idx) =>
+              item.type === "link" ? (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className="btn btn-outline btn-primary w-full justify-center hover:text-white transition-all duration-200 "
+                  style={{
+                    transitionDelay: menuOpen ? `${15}ms` : "0ms",
+                    opacity: menuOpen ? 1 : 0,
+                    transform: `translateY(${menuOpen ? "0" : "-8px"})`,
+                  }}
+                >
+                  {item.name}
+                </a>
+              ) : (
+                <NavButton
+                  key={item.name}
+                  className="btn btn-outline btn-primary w-full justify-center hover:text-white transition-all duration-200"
+                  style={{
+                    transitionDelay: menuOpen ? `${15}ms` : "0ms",
+                    opacity: menuOpen ? 1 : 0,
+                    transform: `translateY(${menuOpen ? "0" : "-8px"})`,
+                  }}
+                >
+                  {item.name}
+                </NavButton>
+              )
+            )}
           </div>
-        )}
+        </div>
       </div>
     </nav>
   );

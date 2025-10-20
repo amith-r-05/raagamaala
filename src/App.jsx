@@ -1,12 +1,14 @@
-import { useState } from "react";
-import "./App.css";
-import Navbar from "./components/Navbar";
+import { Route, Routes } from "react-router-dom";
+import LandingPage from "./pages/LandingPage";
+import "./styles/App.css";
 
 function App() {
   return (
-    <>
-      <Navbar />
-    </>
+    <div className="relative h-full w-full">
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+      </Routes>
+    </div>
   );
 }
 
