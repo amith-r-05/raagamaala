@@ -1,5 +1,6 @@
 import { useState, memo, useMemo, useCallback } from "react";
 import { RiMenuLine } from "react-icons/ri";
+import { Link } from "react-router-dom";
 
 const handleScrollToHero = (e) => {
   e.preventDefault();
@@ -17,14 +18,24 @@ const NAV_LINKS = [
   {
     type: "link",
     name: "Live Classes",
-    href: "#live",
     className: "hidden md:block",
+    to: "/live",
   },
 ];
 
 const BUTTONS = [
-  { type: "button", name: "Sign In", className: "hidden md:block" },
-  { type: "button", name: "Teach Music", className: "hidden md:block" },
+  {
+    type: "button",
+    name: "Sign In",
+    className: "hidden md:block",
+    to: "/sign-in",
+  },
+  {
+    type: "button",
+    name: "Teach Music",
+    className: "hidden md:block",
+    to: "/teach-music",
+  },
 ];
 
 // Constant class strings to avoid recreation
@@ -40,10 +51,12 @@ const BUTTON_CLASSES = {
 };
 
 // Memoized button component for better performance
-const NavButton = memo(({ className, children, ...props }) => (
-  <button className={className} type="button" {...props}>
-    {children}
-  </button>
+const NavButton = memo(({ className, children, to, ...props }) => (
+  <Link to={to}>
+    <button className={className} type="button" {...props}>
+      {children}
+    </button>
+  </Link>
 ));
 NavButton.displayName = "NavButton";
 
@@ -75,13 +88,13 @@ const Navbar = () => {
             </div>
             <div className="hidden md:flex items-center space-x-6">
               {desktopNavLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
-                  href={link.href}
+                  to={link.to}
                   className={BUTTON_CLASSES.hover}
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -91,13 +104,14 @@ const Navbar = () => {
             {desktopButtons.map((btn) => (
               <NavButton
                 key={btn.name}
+                to={btn.to}
                 className={`${BUTTON_CLASSES.common} ${btn.className}`}
               >
                 {btn.name}
               </NavButton>
             ))}
 
-            <NavButton className={BUTTON_CLASSES.primary}>
+            <NavButton className={BUTTON_CLASSES.primary} to="/get-started">
               Get Started
             </NavButton>
 
@@ -122,11 +136,11 @@ const Navbar = () => {
               menuOpen ? "100" : "0"
             } transform ${menuOpen ? "translate-y-0" : "-translate-y-2"}`}
           >
-            {mobileMenuItems.map((item, idx) =>
+            {mobileMenuItems.map((item) =>
               item.type === "link" ? (
-                <a
+                <Link
                   key={item.name}
-                  href={item.href}
+                  to={item.to}
                   className="btn btn-outline btn-primary w-full justify-center hover:text-white transition-all duration-200 "
                   style={{
                     transitionDelay: menuOpen ? `${15}ms` : "0ms",
@@ -135,10 +149,11 @@ const Navbar = () => {
                   }}
                 >
                   {item.name}
-                </a>
+                </Link>
               ) : (
                 <NavButton
                   key={item.name}
+                  to={item.to}
                   className="btn btn-outline btn-primary w-full justify-center hover:text-white transition-all duration-200"
                   style={{
                     transitionDelay: menuOpen ? `${15}ms` : "0ms",
