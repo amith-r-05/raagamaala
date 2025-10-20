@@ -6,14 +6,9 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   plugins: [
     react(),
-    tailwindcss((theme) => ({
-      theme: {
-        extend: {
-          colors: {
-            primaryBG: "#F3ECE7",
-          },
-        },
-      },
-    })),
+    tailwindcss(),
   ],
+  server: {
+    host: true,
+  },
 });

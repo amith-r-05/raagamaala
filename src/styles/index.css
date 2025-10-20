@@ -1,0 +1,38 @@
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap");
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+
+@import "tailwindcss";
+
+@plugin "daisyui" {
+    themes: light --default, dark --preferslight;
+    /* You can also specify more: e.g. mybrand, cupcake etc */
+}
+
+body {
+    font-family: 'Inter';
+    font-size: 16px;
+    background-color: #F3ECE7;
+}
+
+.hero-bg {
+    background-image: url("../assets/images/utils/website_bg_img.jpg");
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.hero-overlay {
+    background: linear-gradient(135deg, rgba(243, 236, 231, 0.95) 0%, rgba(243, 236, 231, 0.85) 50%, rgba(243, 236, 231, 0.75) 100%);
+}
+
+.card-texture {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%);
+    backdrop-filter: blur(10px);
+}
+
+.section-divider {
+    background: linear-gradient(90deg, transparent 0%, rgba(93, 58, 155, 0.2) 50%, transparent 100%);
+    height: 1px;
+}
